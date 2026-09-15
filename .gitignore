@@ -1,2 +1,22 @@
 .env
 .venv/
+
+.DS_Store
+__pycache__/
+*.pyc
+
+# runtime state (not source)
+**/history.json
+**/stats.json
+**/summary.json
+**/facts.json
+**/branches.json
+**/short_term.json
+**/working_memory.json
+**/long_term_memory.json
+
+# accidental empty file
+day11/streamlit
+
+# day12 live demo dump (optional local artifact)
+day12/demo_results.json
