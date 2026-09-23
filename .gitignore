@@ -20,3 +20,8 @@ day11/streamlit
 
 # day12 live demo dump (optional local artifact)
 day12/demo_results.json
+
+# day18 scheduler snapshots
+day18/data/*.db
+day18/data/*.db-wal
+day18/data/*.db-shm
