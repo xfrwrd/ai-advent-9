@@ -25,3 +25,6 @@ day12/demo_results.json
 day18/data/*.db
 day18/data/*.db-wal
 day18/data/*.db-shm
+
+# day19 pipeline output
+day19/data/*.json
