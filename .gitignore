@@ -28,3 +28,6 @@ day18/data/*.db-shm
 
 # day19 pipeline output
 day19/data/*.json
+
+# day21 generated index
+day21/index/
