@@ -22,8 +22,9 @@ class Day24Agent:
     def __init__(self, pipeline: Day23Agent) -> None:
         self.pipeline = pipeline
 
-    def ask(self, question: str) -> RAGResponse:
-        rewritten = rewrite_query(question, self.pipeline.chat_fn)
+    def ask(self, question: str, search_query: str | None = None) -> RAGResponse:
+        prepared = (search_query or "").strip()
+        rewritten = prepared or rewrite_query(question, self.pipeline.chat_fn)
         hits = self.pipeline.search_fn(
             self.pipeline.index,
             self.pipeline.embedder,

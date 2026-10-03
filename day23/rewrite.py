@@ -12,12 +12,20 @@ REWRITE_SYSTEM = (
 )
 
 
-def rewrite_query(question: str, chat_fn: ChatFn) -> str:
+def rewrite_query(question: str, chat_fn: ChatFn, context: str = "") -> str:
+    system = REWRITE_SYSTEM
+    user = question
+    if context.strip():
+        system += (
+            " Если дан контекст диалога, раскрой местоимения и тему из него. "
+            "Не добавляй факты, которых нет ни в вопросе, ни в этом контексте."
+        )
+        user = f"Контекст диалога:\n{context.strip()}\n\nТекущий вопрос:\n{question}"
     try:
         raw = chat_fn(
             [
-                {"role": "system", "content": REWRITE_SYSTEM},
-                {"role": "user", "content": question},
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
             ]
         )
     except Exception:

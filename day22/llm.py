@@ -8,7 +8,7 @@ import requests
 from dotenv import load_dotenv
 
 API_URL = "https://api.deepseek.com/chat/completions"
-MODEL = "deepseek-v4-flash"
+MODEL = "deepseek-v4-pro"
 
 
 def chat(messages: list[dict[str, str]]) -> str:
@@ -23,7 +23,7 @@ def chat(messages: list[dict[str, str]]) -> str:
             "Content-Type": "application/json",
         },
         json={"model": MODEL, "messages": messages},
-        timeout=60,
+        timeout=(10, 45),
     )
     response.raise_for_status()
     return str(response.json()["choices"][0]["message"]["content"])
