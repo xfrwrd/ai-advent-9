@@ -17,12 +17,15 @@ class LocalLLMClient:
         self.base_url = base_url.rstrip("/")
         self.model = model
 
-    def ask(self, prompt: str) -> str:
+    def ask(self, prompt: str, *, think: bool | None = None) -> str:
         url = f"{self.base_url}/api/generate"
+        payload: dict[str, object] = {"model": self.model, "prompt": prompt, "stream": False}
+        if think is not None:
+            payload["think"] = think
         try:
             response = requests.post(
                 url,
-                json={"model": self.model, "prompt": prompt, "stream": False},
+                json=payload,
                 timeout=(10, 180),
             )
         except requests.ConnectionError as exc:
