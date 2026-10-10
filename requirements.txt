@@ -3,3 +3,5 @@ python-dotenv
 streamlit
 mcp>=1.0
 numpy
+fastapi
+uvicorn
