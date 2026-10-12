@@ -31,3 +31,6 @@ day19/data/*.json
 
 # day21 generated index
 day21/index/
+
+# day31 generated documentation index
+day31/index/
