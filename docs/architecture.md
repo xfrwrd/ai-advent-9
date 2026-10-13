@@ -60,3 +60,13 @@ export DAY30_API_KEY='свой-длинный-токен'
 Поиск переиспользует `day22/retrieve.py` и `LocalHashEmbedder`. Ответ по документации пишет `LocalLLMClient` с `think=False`. Текущую Git-ветку возвращает отдельный MCP-инструмент `git_current_branch` из `day31/mcp_server.py`. Обработчик `/help` сам Git не вызывает.
 
 Инструменты этого сервера только читают: ветка, `git status`, короткая сводка diff, список файлов, которые уже отслеживает Git. Push, reset, checkout и удаление файлов туда не входят.
+
+## Code review, день 32
+
+`day32` сравнивает два Git ref и не меняет репозиторий. Diff берётся командами `git diff` и `git rev-parse` через `subprocess` без shell.
+
+Индексы документации и `.py` пишутся в `day32/index/` из одного коммита командой `python -m day32.index_code`. Содержимое читается через `git show`, а не из несохранённой рабочей копии. Если commit индекса не совпадает с `--head`, RAG в ревью не подмешивается.
+
+Поиск документов и кода — `day31/retrieve.py`. Ответ пишет `LocalLLMClient` с `think=False`. Замечание попадает в отчёт только если файл есть в проанализированном diff, номер строки попадает в hunk, а `evidence` дословно встречается в diff или в приложенном контексте.
+
+GitHub Actions workflow `.github/workflows/day32-review.yml` рассчитан на self-hosted runner с локальной Ollama. На GitHub он пока не запускался. Комментарий в PR и merge по ответу модели не делаются.
