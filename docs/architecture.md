@@ -70,3 +70,11 @@ export DAY30_API_KEY='свой-длинный-токен'
 Поиск документов и кода — `day31/retrieve.py`. Ответ пишет `LocalLLMClient` с `think=False`. Замечание попадает в отчёт только если файл есть в проанализированном diff, номер строки попадает в hunk, а `evidence` дословно встречается в diff или в приложенном контексте.
 
 GitHub Actions workflow `.github/workflows/day32-review.yml` рассчитан на self-hosted runner с локальной Ollama. На GitHub он пока не запускался. Комментарий в PR и merge по ответу модели не делаются.
+
+## Поддержка, день 33
+
+`day33` — ассистент учебного продукта DemoPortal. Он не читает Git и не использует отчёты code review.
+
+Общие инструкции лежат в `day33/knowledge/` и индексируются отдельно в `day33/index/support.sqlite`. Пользователи и тикеты лежат в `day33/data/support.json` и в этот индекс не входят. Их читает только MCP-сервер `day33/mcp_server.py`.
+
+Пользовательский ответ собирает `day33/support.py`: выбранный demo-пользователь, проверка что тикет его, затем инструменты `get_user`, `list_user_tickets`, `get_ticket`, `get_ticket_history`, затем поиск по индексу через `day31.retrieve.relevant` и `LocalLLMClient` с `think=False`. Чужой тикет отклоняется до чтения карточки и до вызова модели. Смена `session_id` не открывает чужую историю: сессия привязана к пользователю и режиму.
