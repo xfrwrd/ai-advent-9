@@ -78,3 +78,11 @@ GitHub Actions workflow `.github/workflows/day32-review.yml` рассчитан 
 Общие инструкции лежат в `day33/knowledge/` и индексируются отдельно в `day33/index/support.sqlite`. Пользователи и тикеты лежат в `day33/data/support.json` и в этот индекс не входят. Их читает только MCP-сервер `day33/mcp_server.py`.
 
 Пользовательский ответ собирает `day33/support.py`: выбранный demo-пользователь, проверка что тикет его, затем инструменты `get_user`, `list_user_tickets`, `get_ticket`, `get_ticket_history`, затем поиск по индексу через `day31.retrieve.relevant` и `LocalLLMClient` с `think=False`. Чужой тикет отклоняется до чтения карточки и до вызова модели. Смена `session_id` не открывает чужую историю: сессия привязана к пользователю и режиму.
+
+## Файловый ассистент, день 34
+
+`day34` — агент по файлам Git-репозитория. Цикл в `day34/agent.py`: модель `qwen3:8b` через `day34/llm.py` (наследник `LocalLLMClient` из Day 26) на каждом шаге возвращает JSON с одним вызовом инструмента или финальным ответом. Python проверяет имя и аргументы, лимиты шагов, файлов, контекста, времени и ошибок подряд.
+
+Инструменты разделены на два MCP-сервера: `day34/mcp_files.py` (`list_files`, `search_in_files`, `read_file`) и `day34/mcp_changes.py` (`propose_file_change`, `apply_file_change`, `cancel_file_change`). Агенту доступны чтение и `propose_file_change`. `apply_file_change` вызывают только страница или CLI после подтверждения пользователя, с хешем показанного diff.
+
+Пути проверяет `day34/policy.py` на стороне сервера: корень Git-репозитория, без `../`, symlink наружу, `.git`, `.venv`, секретов; запись только `.md` и `.txt`. Отчёты запусков: `day34/artifacts/runs/`.
