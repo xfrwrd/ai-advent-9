@@ -36,8 +36,9 @@ STEP_BY_STEP_SUFFIX = "\n\nРеши задачу пошагово."
 
 CONCISE_SUFFIX = "\n\nОтветь структурированно, не более 300 слов."
 
-MAX_OUTPUT_TOKENS = 600
-MAX_ANALYSIS_TOKENS = 800
+MAX_OUTPUT_TOKENS = 1200
+MAX_EXPERTS_TOKENS = 2400
+MAX_ANALYSIS_TOKENS = 1500
 
 EXPERTS_SYSTEM_PROMPT = """Ты проводишь экспертный консилиум из трёх независимых ролей.
 
@@ -66,7 +67,8 @@ EXPERTS_SYSTEM_PROMPT = """Ты проводишь экспертный конс
 ## Критик
 ...
 
-Не объединяй роли в один общий ответ. Весь ответ — не более 300 слов."""
+Не объединяй роли в один общий ответ.
+Каждый раздел — не более 120 слов. Все три раздела обязательны и должны быть завершены."""
 
 COMPARISON_REQUEST = """Тебе дана аналитическая задача и четыре решения, полученные разными способами рассуждения.
 
@@ -167,7 +169,10 @@ def show_metrics(data: dict, elapsed: float | None = None) -> None:
     if elapsed is not None:
         st.caption(f"время: {elapsed:.1f} с")
     st.caption(f"output tokens: {data['usage']['completion_tokens']}")
-    st.caption(f"finish_reason: {choice['finish_reason']}")
+    finish_reason = choice["finish_reason"]
+    st.caption(f"finish_reason: {finish_reason}")
+    if finish_reason == "length":
+        st.warning("Ответ обрезан лимитом max_tokens.")
 
 
 def show_answer(content: str) -> None:
@@ -181,11 +186,11 @@ def show_result(data: dict, elapsed: float | None = None) -> None:
     show_metrics(data, elapsed)
 
 
-def base_payload(messages: list[dict]) -> dict:
+def base_payload(messages: list[dict], max_tokens: int = MAX_OUTPUT_TOKENS) -> dict:
     return {
         "model": MODEL,
         "messages": messages,
-        "max_tokens": MAX_OUTPUT_TOKENS,
+        "max_tokens": max_tokens,
         "thinking": THINKING_DISABLED,
     }
 
@@ -271,8 +276,9 @@ def run_comparison(api_key: str, task: str) -> dict:
         "Experts": base_payload(
             [
                 {"role": "system", "content": EXPERTS_SYSTEM_PROMPT},
-                {"role": "user", "content": task_with_suffix(task)},
-            ]
+                {"role": "user", "content": task},
+            ],
+            max_tokens=MAX_EXPERTS_TOKENS,
         ),
     }
 
@@ -354,7 +360,10 @@ def show_meta_result(meta: dict, prompt_elapsed: float | None, solution_elapsed:
 st.set_page_config(page_title="Day 3 — способы рассуждения", layout="wide")
 
 st.title("Day 3 — способы рассуждения")
-st.caption("Все стратегии получают одинаковое ограничение: не более 300 слов, max_tokens=600.")
+st.caption(
+    "Direct / Step-by-step / Meta: max_tokens=1200. "
+    "Experts: max_tokens=2400. Сравнительный анализ: max_tokens=1500."
+)
 
 task = st.text_area("Задача", value=DEFAULT_TASK, height=150)
 
